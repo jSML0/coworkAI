@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+@layer base {
+  * {
+    border-color: #222B3A;
+  }
+  body {
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+/* Custom JustCo theme classes */
+.bg-justco-dark { background-color: #0B0F15; }
+.bg-justco-card { background-color: #131822; }
+.bg-justco-surface { background-color: #1A212D; }
+.bg-justco-hover { background-color: #222B3A; }
+.border-justco-border { border-color: #273142; }
+.text-justco-teal { color: #00D2B4; }
+.bg-justco-teal { background-color: #00D2B4; }
+.hover\:bg-justco-teal-dark:hover { background-color: #009F89; }
+.text-justco-muted { color: #8B98A9; }
+.shadow-glow-teal { box-shadow: 0 0 20px -3px rgba(0, 210, 180, 0.35); }
+.shadow-glow-indigo { box-shadow: 0 0 20px -3px rgba(99, 102, 241, 0.35); }
+
+/* Custom modern scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #273142;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #36ECD2;
+}
+
+/* Glassmorphism utilities */
+.glass-panel {
+  background: rgba(19, 24, 34, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.glass-card {
+  background: rgba(26, 33, 45, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Subtle holographic pass effect */
+.hologram-shimmer {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(0, 210, 180, 0.12) 35%,
+    rgba(99, 102, 241, 0.18) 50%,
+    rgba(245, 158, 11, 0.12) 65%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 200%;
+  animation: shimmer 6s ease infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+@keyframes scanline {
+  0% { top: 0%; opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.animate-scanline {
+  animation: scanline 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
