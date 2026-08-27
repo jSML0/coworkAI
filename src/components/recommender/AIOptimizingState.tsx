@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, BrainCircuit, CheckCircle2, Cpu, Zap } from 'lucide-react';
+import { Sparkles, BrainCircuit, CheckCircle2 } from 'lucide-react';
+import { BrandGridWatermark } from '../common/BrandGridWatermark';
 
 export const AIOptimizingState: React.FC<{ onComplete?: () => void }> = ({ onComplete }) => {
   const [progress, setProgress] = useState(15);
@@ -34,45 +35,47 @@ export const AIOptimizingState: React.FC<{ onComplete?: () => void }> = ({ onCom
   }, [progress]);
 
   return (
-    <div className="p-6 rounded-3xl bg-[#121824] border border-teal-500/40 shadow-2xl flex flex-col items-center justify-center text-center space-y-4 my-4">
+    <div className="relative p-6 rounded-3xl bg-white border border-[#21B5FF]/40 shadow-xl flex flex-col items-center justify-center text-center space-y-4 my-4 overflow-hidden">
+      <BrandGridWatermark className="absolute top-3 right-3 pointer-events-none select-none" opacity="opacity-35" />
+      
       {/* Glowing AI Core Indicator */}
       <div className="relative">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-justco-teal via-cyan-400 to-indigo-600 flex items-center justify-center p-[2px] shadow-glow-teal animate-pulse">
-          <div className="w-full h-full bg-[#0E141E] rounded-[14px] flex items-center justify-center text-justco-teal">
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#21B5FF] via-cyan-400 to-blue-600 flex items-center justify-center p-[2px] shadow-glow-blue animate-pulse">
+          <div className="w-full h-full bg-white rounded-[14px] flex items-center justify-center text-[#21B5FF]">
             <BrainCircuit className="w-8 h-8 animate-spin-slow" />
           </div>
         </div>
-        <div className="absolute -top-1 -right-1 w-5 h-5 bg-teal-400 rounded-full border-2 border-[#121824] flex items-center justify-center text-black font-black text-[9px]">
+        <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#21B5FF] rounded-full border-2 border-white flex items-center justify-center text-white font-black text-[9px]">
           ⚡
         </div>
       </div>
 
       <div>
-        <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-justco-teal uppercase tracking-wider">
+        <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-[#0099FF] uppercase tracking-wider font-mono">
           <Sparkles className="w-3.5 h-3.5" />
           <span>AI Constraint Optimization Engine</span>
         </div>
-        <h3 className="text-sm font-extrabold text-white mt-1">
+        <h3 className="text-sm font-extrabold text-[#000105] mt-1">
           Synthesizing Multi-Variable Workspace Match...
         </h3>
       </div>
 
       {/* Progress Bar */}
       <div className="w-full max-w-xs space-y-1">
-        <div className="w-full h-2 bg-[#1A2332] rounded-full overflow-hidden">
+        <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-justco-teal via-cyan-400 to-indigo-500 transition-all duration-200"
+            className="h-full bg-gradient-to-r from-[#21B5FF] via-[#0099FF] to-blue-600 transition-all duration-200"
             style={{ width: `${Math.min(100, progress)}%` }}
           />
         </div>
-        <div className="flex justify-between text-[10px] text-slate-400 font-mono">
+        <div className="flex justify-between text-[10px] text-slate-500 font-mono">
           <span>Constraint Solver</span>
-          <span className="text-justco-teal font-bold">{Math.min(100, progress)}%</span>
+          <span className="text-[#0099FF] font-bold">{Math.min(100, progress)}%</span>
         </div>
       </div>
 
       {/* Step List */}
-      <div className="w-full space-y-1.5 text-left text-xs bg-[#0E131C] p-3 rounded-2xl border border-[#1E2738]">
+      <div className="w-full space-y-1.5 text-left text-xs bg-slate-50 p-3 rounded-2xl border border-slate-200">
         {optimizationSteps.map((stepText, idx) => {
           const isDone = activeStep > idx;
           const isCurrent = activeStep === idx;
@@ -82,18 +85,18 @@ export const AIOptimizingState: React.FC<{ onComplete?: () => void }> = ({ onCom
               key={idx}
               className={`flex items-center gap-2 text-[11px] transition-colors ${
                 isDone
-                  ? 'text-emerald-400'
+                  ? 'text-emerald-700 font-medium'
                   : isCurrent
-                  ? 'text-justco-teal font-semibold'
-                  : 'text-slate-500'
+                  ? 'text-[#0099FF] font-semibold'
+                  : 'text-slate-400'
               }`}
             >
               {isDone ? (
                 <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
               ) : isCurrent ? (
-                <div className="w-3.5 h-3.5 rounded-full border-2 border-justco-teal border-t-transparent animate-spin flex-shrink-0" />
+                <div className="w-3.5 h-3.5 rounded-full border-2 border-[#21B5FF] border-t-transparent animate-spin flex-shrink-0" />
               ) : (
-                <div className="w-3.5 h-3.5 rounded-full border border-slate-600 flex-shrink-0" />
+                <div className="w-3.5 h-3.5 rounded-full border border-slate-300 flex-shrink-0" />
               )}
               <span className="truncate">{stepText}</span>
             </div>

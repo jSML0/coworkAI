@@ -4,9 +4,11 @@ import {
   Visitor,
   HubLocation,
   AIMatchResult,
+  DispatchTask,
   OpsTicket,
   DeviceViewMode,
 } from '../types/orchestrator';
+
 import {
   INITIAL_EMPLOYEES,
   INITIAL_VISITORS,
@@ -48,6 +50,12 @@ interface OrchestratorContextType {
   
   desksCount: number;
   setDesksCount: (count: number) => void;
+  desksTimeWindow: string;
+  setDesksTimeWindow: (window: string) => void;
+  privacyPodsCount: number;
+  setPrivacyPodsCount: (count: number) => void;
+  podsTimeWindow: string;
+  setPodsTimeWindow: (window: string) => void;
   selectedLayoutId: string;
   setSelectedLayoutId: (id: string) => void;
   selectedHardwareIds: string[];
@@ -82,11 +90,15 @@ interface OrchestratorContextType {
   attendanceRate: number;
   totalCreditsUsed: number;
   totalCateringCost: number;
+  isAfterHours: boolean;
+  airConSurchargePerHour: number;
+  airConSurchargeTotal: number;
   estimatedSavings: number;
   selectedHub: HubLocation;
 }
 
 const OrchestratorContext = createContext<OrchestratorContextType | undefined>(undefined);
+
 
 export const OrchestratorProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
@@ -109,7 +121,11 @@ export const OrchestratorProvider: React.FC<{ children: React.ReactNode }> = ({ 
   });
   
   const [desksCount, setDesksCount] = useState<number>(6);
+  const [desksTimeWindow, setDesksTimeWindow] = useState<string>('Full Day (09:00 - 17:00)');
+  const [privacyPodsCount, setPrivacyPodsCount] = useState<number>(2);
+  const [podsTimeWindow, setPodsTimeWindow] = useState<string>('2-Hour Focus Slot (14:00 - 16:00)');
   const [selectedLayoutId, setSelectedLayoutId] = useState<string>('layout-workshop');
+
   const [selectedHardwareIds, setSelectedHardwareIds] = useState<string[]>([
     'hw-dual-4k', 'hw-neat-360', 'hw-zoom-rooms'
   ]);
@@ -163,15 +179,29 @@ export const OrchestratorProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const attendanceRate = totalParticipants > 0 ? Math.round((checkedInCount / totalParticipants) * 100) : 0;
 
+  const isAfterHours = useMemo(() => {
+    return (
+      selectedTimeSlot.start >= '18:00' ||
+      selectedTimeSlot.end > '18:00' ||
+      selectedTimeSlot.label.toLowerCase().includes('after-hours')
+    );
+  }, [selectedTimeSlot]);
+
+  const airConSurchargePerHour = 75; // SGD/hour commercial building chiller extension rate
+  const airConHours = isAfterHours ? selectedTimeSlot.hours : 0;
+  const airConSurchargeTotal = airConHours * airConSurchargePerHour;
+
   // Real-time cost calculations
   const totalCreditsUsed = useMemo(() => {
-    // Room credits: ~4 credits/hour for standard room, 6 credits/hour for boardroom
+    // Room credits: ~4 credits/hour for standard room, 6 credits/hour for boardroom, 8 credits/hour for presentation/event
     const roomRatePerHour = selectedLayoutId === 'layout-boardroom' ? 6 : selectedLayoutId === 'layout-presentation' ? 8 : 4;
     const roomCredits = roomRatePerHour * (selectedTimeSlot.hours > 4 ? 4 : selectedTimeSlot.hours);
     // Desk credits: 2 credits per desk for full day
     const deskCredits = desksCount * 2;
-    return roomCredits + deskCredits;
-  }, [selectedLayoutId, selectedTimeSlot.hours, desksCount]);
+    // Privacy Pod credits: 1 credit per pod
+    const podCredits = privacyPodsCount * 1;
+    return roomCredits + deskCredits + podCredits;
+  }, [selectedLayoutId, selectedTimeSlot.hours, desksCount, privacyPodsCount]);
 
   const totalCateringCost = useMemo(() => {
     const selectedPkgs = CATERING_PACKAGES.filter((p) => selectedCateringIds.includes(p.id));
@@ -180,7 +210,7 @@ export const OrchestratorProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, [selectedCateringIds, totalParticipants]);
 
   const estimatedSavings = useMemo(() => {
-    // Co-locating desks adjacent to the booked room saves 18% vs booking disparate day passes + ad-hoc meeting rooms
+    // Co-locating desks and privacy pods adjacent to the booked room saves 18% vs booking disparate day passes + ad-hoc meeting rooms
     const standardCost = totalCreditsUsed * 18 + totalCateringCost * 1.15;
     const bundleCost = totalCreditsUsed * 14.5 + totalCateringCost;
     return Math.round(standardCost - bundleCost + 45);
@@ -190,63 +220,114 @@ export const OrchestratorProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const aiMatchResult: AIMatchResult = useMemo(() => {
     const deskIds = Array.from({ length: Math.min(desksCount, 8) }, (_, i) => `D-${12 + i}`);
     const altHubs = JUSTCO_HUBS.filter((h) => h.id !== selectedHub.id);
-    
+
+    const reasons = isAfterHours
+      ? [
+          `🌙 After-Hours Event Space Allocation: ${selectedHub.name} staged for evening session (${selectedTimeSlot.start}–${selectedTimeSlot.end}).`,
+          `❄️ Central Air-Con Extension (+${airConSurchargeTotal} SGD at $${airConSurchargePerHour}/hr): Auto-coordinated building chiller sequence until ${selectedTimeSlot.end}.`,
+          `Direct Co-location: ${desksCount} Hot Desks & ${privacyPodsCount} Soundproof Privacy Pod(s) grouped directly adjacent to the Event Space.`,
+          `Full hardware readiness: ${selectedHardwareIds.length} requested AV systems certified & calibrated with wireless mics & dual 4K stage displays.`,
+        ]
+      : [
+          `Optimal transit score (${selectedHub.transitDistanceMins}m from MRT) with only ${selectedHub.congestionScore}% predicted congestion index.`,
+          `Direct Co-location: ${desksCount} Hot Desks & ${privacyPodsCount} Soundproof Privacy Pod(s) grouped in Zone B, precisely 4.2m from Orion 1 Room.`,
+          `Full hardware readiness: ${selectedHardwareIds.length} requested AV systems certified & calibrated on Level 3.`,
+          `JustCo In-House Barista and Kitchen located on the same floor for zero-latency refreshment SLA.`,
+        ];
+
+    const dispatchSchedule: DispatchTask[] = isAfterHours
+      ? [
+          {
+            id: 'ds-hvac',
+            time: '17:30 PM',
+            title: 'Building HVAC Chiller Extension',
+            description: `Commercial air-con sequence active until ${selectedTimeSlot.end} (Surcharge: $${airConSurchargeTotal} SGD)`,
+            assignee: 'Property Facility Mgt',
+            role: 'Building Engineer',
+            status: 'completed',
+          },
+          {
+            id: 'ds-stage',
+            time: '17:45 PM',
+            title: 'Event Space & Stage Calibration',
+            description: 'Dual 75" 4K displays, stage lapel mics, and evening presentation lighting preset',
+            assignee: 'JustCo Tech Ops',
+            role: 'AV Lead',
+            status: 'completed',
+          },
+          {
+            id: 'ds-sec',
+            time: '18:00 PM',
+            title: 'Night Security & Turnstile Bypass',
+            description: `Gantry night scanners synced for ${totalParticipants} registered attendees & visitor fast-passes`,
+            assignee: 'Clarissa Tan',
+            role: 'Community Lead',
+            status: 'in_progress',
+          },
+          {
+            id: 'ds-cat',
+            time: '19:15 PM',
+            title: 'Nitro Cold Brew & Evening Catering',
+            description: 'Free-flow draft nitro coffee & artisan high-tea canapés delivered to espresso credenza',
+            assignee: 'Sean Leong',
+            role: 'Lead Barista',
+            status: 'pending',
+          },
+        ]
+      : [
+          {
+            id: 'ds-1',
+            time: '08:45 AM',
+            title: 'AV & Room Calibration',
+            description: 'Neat Bar 360 AI framing and dual 4K touch displays auto-diagnostics',
+            assignee: 'JustCo Tech Ops',
+            role: 'AV Technician',
+            status: 'completed',
+          },
+          {
+            id: 'ds-2',
+            time: '08:50 AM',
+            title: 'Hot Desk Cluster Locking',
+            description: `Reserved ${desksCount} contiguous desks in Zone B with digital name e-ink labels`,
+            assignee: 'Clarissa Tan',
+            role: 'Community Lead',
+            status: 'completed',
+          },
+          {
+            id: 'ds-3',
+            time: '09:15 AM',
+            title: 'Barista Morning Roast Delivery',
+            description: 'Handcrafted oat lattes & French croissants delivered to boardroom credenza',
+            assignee: 'Sean Leong',
+            role: 'Lead Barista',
+            status: 'in_progress',
+          },
+          {
+            id: 'ds-4',
+            time: '12:20 PM',
+            title: 'Executive Bento Box Catering',
+            description: 'Pre-portioned lunch boxes & cold juices staged in breakout pantry',
+            assignee: 'JustCo Kitchen',
+            role: 'Catering Partner',
+            status: 'pending',
+          },
+        ];
+
     return {
       hub: selectedHub,
       confidence: selectedHub.matchScore,
-      reasons: [
-        `Optimal transit score (${selectedHub.transitDistanceMins}m from MRT) with only ${selectedHub.congestionScore}% predicted congestion index.`,
-        `Direct Co-location: ${desksCount} Hot Desks grouped in Zone B, precisely 4.2m from Orion 1 Room.`,
-        `Full hardware readiness: ${selectedHardwareIds.length} requested AV systems certified & calibrated on Level 3.`,
-        `JustCo In-House Barista and Kitchen located on the same floor for zero-latency refreshment SLA.`,
-      ],
+      reasons,
       clusterPlan: {
-        roomName: selectedLayoutId === 'layout-boardroom' ? 'Orion Boardroom Suite' : 'Atrium Workshop Studio 1',
+        roomName: selectedLayoutId === 'layout-boardroom' ? 'Orion Boardroom Suite' : selectedLayoutId === 'layout-presentation' ? 'Heritage Event Space & Stage' : 'Atrium Workshop Studio 1',
         roomCapacity: Math.max(totalParticipants + 2, 10),
-        roomZone: 'Zone B (Executive North)',
-        desksZone: 'Zone B — Hot Desk Pods 12–19',
+        roomZone: selectedHub.id === 'hub-cross-street' ? 'Courtyard Wing (Level 2)' : 'Zone B (Executive North)',
+        desksZone: selectedHub.id === 'hub-cross-street' ? 'Courtyard Wing — Hot Desk Pods 12–19' : 'Zone B — Hot Desk Pods 12–19',
         deskIds,
+        privacyPodsCount,
         distanceMeters: 4.2,
         floorLevel: selectedHub.level,
       },
-      dispatchSchedule: [
-        {
-          id: 'ds-1',
-          time: '08:45 AM',
-          title: 'AV & Room Calibration',
-          description: 'Neat Bar 360 AI framing and dual 4K touch displays auto-diagnostics',
-          assignee: 'JustCo Tech Ops',
-          role: 'AV Technician',
-          status: 'completed',
-        },
-        {
-          id: 'ds-2',
-          time: '08:50 AM',
-          title: 'Hot Desk Cluster Locking',
-          description: `Reserved ${desksCount} contiguous desks in Zone B with digital name e-ink labels`,
-          assignee: 'Clarissa Tan',
-          role: 'Community Lead',
-          status: 'completed',
-        },
-        {
-          id: 'ds-3',
-          time: '09:15 AM',
-          title: 'Barista Morning Roast Delivery',
-          description: 'Handcrafted oat lattes & French croissants delivered to boardroom credenza',
-          assignee: 'Sean Leong',
-          role: 'Lead Barista',
-          status: 'in_progress',
-        },
-        {
-          id: 'ds-4',
-          time: '12:20 PM',
-          title: 'Executive Bento Box Catering',
-          description: 'Pre-portioned lunch boxes & cold juices staged in breakout pantry',
-          assignee: 'JustCo Kitchen',
-          role: 'Catering Partner',
-          status: 'pending',
-        },
-      ],
+      dispatchSchedule,
       alternatives: altHubs.map((h) => ({
         hub: h,
         matchScore: h.matchScore,
@@ -256,7 +337,8 @@ export const OrchestratorProvider: React.FC<{ children: React.ReactNode }> = ({ 
             : 'Slightly further hot-desk cluster (approx 12m from meeting room)',
       })),
     };
-  }, [selectedHub, desksCount, selectedLayoutId, totalParticipants, selectedHardwareIds.length]);
+  }, [selectedHub, desksCount, privacyPodsCount, selectedLayoutId, totalParticipants, selectedHardwareIds.length, isAfterHours, selectedTimeSlot, airConSurchargeTotal, airConSurchargePerHour]);
+
 
   const toggleEmployee = (id: string) => {
     setSelectedEmployeeIds((prev) => {
@@ -379,9 +461,25 @@ export const OrchestratorProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setVisitors(preset.selectedVisitors);
     setSelectedHubId(preset.hubId);
     setDesksCount(preset.desksCount);
+    setPrivacyPodsCount(preset.privacyPodsCount ?? 2);
     setSelectedLayoutId(preset.layoutId);
     setSelectedHardwareIds(preset.hardwareIds);
     setSelectedCateringIds(preset.cateringIds);
+
+    if (preset.timeSlot) {
+      setSelectedTimeSlot(preset.timeSlot);
+      setDesksTimeWindow(preset.timeSlot.label);
+      setPodsTimeWindow(`Evening Focus (18:30 - 20:30)`);
+    } else {
+      setSelectedTimeSlot({
+        start: '09:00',
+        end: '17:00',
+        label: 'Full Day Intensive (09:00 - 17:00)',
+        hours: 8,
+      });
+      setDesksTimeWindow('Full Day (09:00 - 17:00)');
+      setPodsTimeWindow('2-Hour Focus Slot (14:00 - 16:00)');
+    }
     
     // Animate AI state
     runAIOptimization();
@@ -432,6 +530,12 @@ export const OrchestratorProvider: React.FC<{ children: React.ReactNode }> = ({ 
         setSelectedTimeSlot,
         desksCount,
         setDesksCount,
+        desksTimeWindow,
+        setDesksTimeWindow,
+        privacyPodsCount,
+        setPrivacyPodsCount,
+        podsTimeWindow,
+        setPodsTimeWindow,
         selectedLayoutId,
         setSelectedLayoutId,
         selectedHardwareIds,
@@ -454,10 +558,14 @@ export const OrchestratorProvider: React.FC<{ children: React.ReactNode }> = ({ 
         attendanceRate,
         totalCreditsUsed,
         totalCateringCost,
+        isAfterHours,
+        airConSurchargePerHour,
+        airConSurchargeTotal,
         estimatedSavings,
         selectedHub,
       }}
     >
+
       {children}
     </OrchestratorContext.Provider>
   );

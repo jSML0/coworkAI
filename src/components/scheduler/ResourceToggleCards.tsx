@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useOrchestrator } from '../../context/OrchestratorContext';
 import {
   Layers,
@@ -12,19 +12,30 @@ import {
   Mic,
   PenTool,
   Coffee,
-  Utensils,
   Plus,
   Minus,
   Check,
   Sparkles,
   MessageSquare,
+  PhoneCall,
+  Calendar,
+  Clock,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { MEETING_LAYOUTS, VC_HARDWARE_OPTIONS, CATERING_PACKAGES } from '../../data/mockData';
+import { BrandGridWatermark } from '../common/BrandGridWatermark';
 
 export const ResourceToggleCards: React.FC = () => {
   const {
     desksCount,
     setDesksCount,
+    desksTimeWindow,
+    setDesksTimeWindow,
+    privacyPodsCount,
+    setPrivacyPodsCount,
+    podsTimeWindow,
+    setPodsTimeWindow,
     selectedLayoutId,
     setSelectedLayoutId,
     selectedHardwareIds,
@@ -35,6 +46,23 @@ export const ResourceToggleCards: React.FC = () => {
     setSpecialInstructions,
     totalParticipants,
   } = useOrchestrator();
+
+  const [isDesksWindowOpen, setIsDesksWindowOpen] = useState(false);
+  const [isPodsWindowOpen, setIsPodsWindowOpen] = useState(false);
+
+  const deskWindowOptions = [
+    'Full Day (09:00 - 17:00)',
+    'Morning Half-Day (09:00 - 13:00)',
+    'Afternoon & Evening (13:00 - 18:00)',
+    'Custom 2-Hour Intensive (10:00 - 12:00)',
+  ];
+
+  const podWindowOptions = [
+    '2-Hour Focus Slot (14:00 - 16:00)',
+    'Morning Client Calls (10:00 - 12:00)',
+    'Afternoon 1-on-1s (13:00 - 17:00)',
+    'Full Day Window (09:00 - 17:00)',
+  ];
 
   const getLayoutIcon = (iconName: string) => {
     switch (iconName) {
@@ -71,62 +99,213 @@ export const ResourceToggleCards: React.FC = () => {
   return (
     <div className="space-y-4">
       {/* Dedicated Hot Desks Co-location Counter */}
-      <div className="bg-[#141B26] border border-[#222C3D] rounded-2xl p-4 shadow-sm">
-        <div className="flex items-center justify-between">
+      <div className="relative bg-white border border-slate-200 rounded-2xl p-4 shadow-sm overflow-hidden">
+        <BrandGridWatermark className="absolute top-3 right-3 pointer-events-none select-none" opacity="opacity-30" />
+        
+        <div className="flex items-center justify-between pr-6">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-teal-500/15 border border-teal-500/30 flex items-center justify-center text-justco-teal">
+            <div className="w-7 h-7 rounded-lg bg-[#EBF7FF] border border-[#21B5FF]/30 flex items-center justify-center text-[#0099FF]">
               <Layers className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+              <h3 className="text-xs font-bold text-[#000105] uppercase tracking-wider">
                 Dedicated Desks Needed
               </h3>
-              <p className="text-[11px] text-slate-400">Co-located hot desks for pre/post meeting work</p>
+              <p className="text-[11px] text-slate-500">Co-located hot desks for pre/post meeting work</p>
             </div>
           </div>
 
           {/* Counter Controls */}
-          <div className="flex items-center gap-2.5 bg-[#10151E] px-2.5 py-1.5 rounded-xl border border-[#242F42]">
+          <div className="flex items-center gap-2.5 bg-slate-100 px-2.5 py-1.5 rounded-xl border border-slate-200">
             <button
               onClick={() => setDesksCount(Math.max(0, desksCount - 1))}
-              className="w-7 h-7 rounded-lg bg-[#1B2433] hover:bg-[#253247] text-white flex items-center justify-center transition-colors"
+              className="w-7 h-7 rounded-lg bg-white hover:bg-slate-200 text-[#000105] flex items-center justify-center transition-colors shadow-xs"
             >
               <Minus className="w-3.5 h-3.5" />
             </button>
-            <span className="w-8 text-center font-bold text-sm text-justco-teal font-mono">
+            <span className="w-8 text-center font-bold text-sm text-[#0099FF] font-mono">
               {desksCount}
             </span>
             <button
               onClick={() => setDesksCount(Math.min(16, desksCount + 1))}
-              className="w-7 h-7 rounded-lg bg-[#1B2433] hover:bg-[#253247] text-white flex items-center justify-center transition-colors"
+              className="w-7 h-7 rounded-lg bg-white hover:bg-slate-200 text-[#000105] flex items-center justify-center transition-colors shadow-xs"
             >
               <Plus className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
 
+        {/* Independent Window Period Selection Trigger */}
+        <div className="mt-3 pt-2.5 border-t border-slate-100 flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+              <Clock className="w-3.5 h-3.5 text-[#0099FF]" />
+              <span>Desk Window Period:</span>
+            </div>
+
+            <button
+              onClick={() => setIsDesksWindowOpen(!isDesksWindowOpen)}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-50 hover:bg-[#EBF7FF] text-slate-700 hover:text-[#0099FF] border border-slate-200 text-[11px] font-semibold transition-all shadow-xs"
+            >
+              <Calendar className="w-3.5 h-3.5 text-[#0099FF]" />
+              <span className="font-mono">{desksTimeWindow}</span>
+              {isDesksWindowOpen ? (
+                <ChevronUp className="w-3 h-3 text-slate-400" />
+              ) : (
+                <ChevronDown className="w-3 h-3 text-slate-400" />
+              )}
+            </button>
+          </div>
+
+          {/* Collapsible Window Options */}
+          {isDesksWindowOpen && (
+            <div className="grid grid-cols-2 gap-1.5 p-2 rounded-xl bg-slate-50 border border-slate-200 animate-in fade-in duration-150">
+              {deskWindowOptions.map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => {
+                    setDesksTimeWindow(opt);
+                    setIsDesksWindowOpen(false);
+                  }}
+                  className={`text-left text-[10px] p-2 rounded-lg border font-mono transition-all ${
+                    desksTimeWindow === opt
+                      ? 'bg-[#21B5FF] text-white border-[#21B5FF] font-bold shadow-xs'
+                      : 'bg-white text-slate-700 border-slate-200 hover:border-[#21B5FF]/50'
+                  }`}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Co-location Intelligence Highlight */}
-        <div className="mt-3 p-2.5 rounded-xl bg-teal-500/10 border border-teal-500/25 flex items-start gap-2">
-          <Sparkles className="w-3.5 h-3.5 text-justco-teal flex-shrink-0 mt-0.5" />
-          <p className="text-[11px] text-teal-200">
-            <strong>Smart Co-Location:</strong> AI reserves {desksCount} contiguous desks in{' '}
-            <strong>Zone B (Pods 12–{12 + Math.max(0, desksCount - 1)})</strong>, directly adjacent
-            to your meeting suite for seamless breakout workflows.
+        <div className="mt-2.5 p-2.5 rounded-xl bg-[#EBF7FF] border border-[#21B5FF]/30 flex items-start gap-2">
+          <Sparkles className="w-3.5 h-3.5 text-[#0099FF] flex-shrink-0 mt-0.5" />
+          <p className="text-[11px] text-slate-700 leading-relaxed">
+            <strong className="text-[#0099FF]">Smart Co-Location:</strong> AI reserves {desksCount} contiguous desks in{' '}
+            <strong className="text-[#000105]">Zone B (Pods 12–{12 + Math.max(0, desksCount - 1)})</strong> for{' '}
+            <strong className="text-[#000105] font-mono">{desksTimeWindow}</strong>, directly adjacent to your meeting suite.
           </p>
         </div>
       </div>
 
+      {/* Privacy Pods Needed Section */}
+      <div className="relative bg-white border border-slate-200 rounded-2xl p-4 shadow-sm overflow-hidden">
+        <BrandGridWatermark className="absolute top-3 right-3 pointer-events-none select-none" opacity="opacity-30" />
+        
+        <div className="flex items-center justify-between pr-6">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-[#EBF7FF] border border-[#21B5FF]/30 flex items-center justify-center text-[#0099FF]">
+              <PhoneCall className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="text-xs font-bold text-[#000105] uppercase tracking-wider">
+                Privacy Pods Needed
+              </h3>
+              <p className="text-[11px] text-slate-500">Soundproof acoustic phone booths & 1-on-1 focus pods</p>
+            </div>
+          </div>
+
+          {/* Counter Controls */}
+          <div className="flex items-center gap-2.5 bg-slate-100 px-2.5 py-1.5 rounded-xl border border-slate-200">
+            <button
+              onClick={() => setPrivacyPodsCount(Math.max(0, privacyPodsCount - 1))}
+              className="w-7 h-7 rounded-lg bg-white hover:bg-slate-200 text-[#000105] flex items-center justify-center transition-colors shadow-xs"
+            >
+              <Minus className="w-3.5 h-3.5" />
+            </button>
+            <span className="w-8 text-center font-bold text-sm text-[#0099FF] font-mono">
+              {privacyPodsCount}
+            </span>
+            <button
+              onClick={() => setPrivacyPodsCount(Math.min(8, privacyPodsCount + 1))}
+              className="w-7 h-7 rounded-lg bg-white hover:bg-slate-200 text-[#000105] flex items-center justify-center transition-colors shadow-xs"
+            >
+              <Plus className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Independent Window Period Selection Trigger for Privacy Pods */}
+        <div className="mt-3 pt-2.5 border-t border-slate-100 flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+              <Clock className="w-3.5 h-3.5 text-[#0099FF]" />
+              <span>Pod Window Period:</span>
+            </div>
+
+            <button
+              onClick={() => setIsPodsWindowOpen(!isPodsWindowOpen)}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-50 hover:bg-[#EBF7FF] text-slate-700 hover:text-[#0099FF] border border-slate-200 text-[11px] font-semibold transition-all shadow-xs"
+            >
+              <Calendar className="w-3.5 h-3.5 text-[#0099FF]" />
+              <span className="font-mono">{podsTimeWindow}</span>
+              {isPodsWindowOpen ? (
+                <ChevronUp className="w-3 h-3 text-slate-400" />
+              ) : (
+                <ChevronDown className="w-3 h-3 text-slate-400" />
+              )}
+            </button>
+          </div>
+
+          {/* Collapsible Window Options */}
+          {isPodsWindowOpen && (
+            <div className="grid grid-cols-2 gap-1.5 p-2 rounded-xl bg-slate-50 border border-slate-200 animate-in fade-in duration-150">
+              {podWindowOptions.map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => {
+                    setPodsTimeWindow(opt);
+                    setIsPodsWindowOpen(false);
+                  }}
+                  className={`text-left text-[10px] p-2 rounded-lg border font-mono transition-all ${
+                    podsTimeWindow === opt
+                      ? 'bg-[#21B5FF] text-white border-[#21B5FF] font-bold shadow-xs'
+                      : 'bg-white text-slate-700 border-slate-200 hover:border-[#21B5FF]/50'
+                  }`}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Acoustic Pods Intelligence Callout */}
+        {privacyPodsCount > 0 ? (
+          <div className="mt-2.5 p-2.5 rounded-xl bg-[#EBF7FF] border border-[#21B5FF]/30 flex items-start gap-2">
+            <Sparkles className="w-3.5 h-3.5 text-[#0099FF] flex-shrink-0 mt-0.5" />
+            <p className="text-[11px] text-slate-700 leading-relaxed">
+              <strong className="text-[#0099FF]">Smart Acoustic Co-Location:</strong> AI reserves{' '}
+              <strong className="text-[#000105]">
+                {privacyPodsCount} Soundproof Privacy Pod{privacyPodsCount > 1 ? 's' : ''} (Class A Acoustic Rating, HEPA ventilation & ring light)
+              </strong>{' '}
+              for <strong className="text-[#000105] font-mono">{podsTimeWindow}</strong> in Zone B adjacent to hot desks.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-2.5 p-2.5 rounded-xl bg-slate-50 border border-dashed border-slate-200 text-center">
+            <span className="text-[11px] text-slate-400">No private acoustic pods reserved.</span>
+          </div>
+        )}
+      </div>
+
+
       {/* Meeting Room Layout */}
-      <div className="bg-[#141B26] border border-[#222C3D] rounded-2xl p-4 shadow-sm">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-7 h-7 rounded-lg bg-teal-500/15 border border-teal-500/30 flex items-center justify-center text-justco-teal">
+      <div className="relative bg-white border border-slate-200 rounded-2xl p-4 shadow-sm overflow-hidden">
+        <BrandGridWatermark className="absolute top-3 right-3 pointer-events-none select-none" opacity="opacity-30" />
+        
+        <div className="flex items-center gap-2 mb-3 pr-6">
+          <div className="w-7 h-7 rounded-lg bg-[#EBF7FF] border border-[#21B5FF]/30 flex items-center justify-center text-[#0099FF]">
             <LayoutGrid className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-[#000105] uppercase tracking-wider">
               Meeting Room Configuration
             </h3>
-            <p className="text-[11px] text-slate-400">Select layout matching your agenda</p>
+            <p className="text-[11px] text-slate-500">Select layout matching your agenda</p>
           </div>
         </div>
 
@@ -141,36 +320,36 @@ export const ResourceToggleCards: React.FC = () => {
                 onClick={() => setSelectedLayoutId(layout.id)}
                 className={`p-3 rounded-2xl border text-left transition-all ${
                   isSelected
-                    ? 'bg-[#1C2638] border-justco-teal shadow-md shadow-teal-500/10'
-                    : 'bg-[#111722] border-[#202B3C] hover:border-[#2F3E56]'
+                    ? 'bg-[#EBF7FF] border-[#21B5FF] shadow-sm'
+                    : 'bg-slate-50 border-slate-200/90 hover:border-slate-300'
                 }`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2">
                     <div
                       className={`w-7 h-7 rounded-lg flex items-center justify-center ${
-                        isSelected ? 'bg-justco-teal text-black' : 'bg-[#1C2534] text-slate-400'
+                        isSelected ? 'bg-[#21B5FF] text-white shadow-xs' : 'bg-slate-200 text-slate-600'
                       }`}
                     >
                       <LayoutIcon className="w-4 h-4" />
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-white">{layout.name}</h4>
-                      <span className="text-[10px] text-justco-teal font-medium">{layout.tagline}</span>
+                      <h4 className="text-xs font-bold text-[#000105]">{layout.name}</h4>
+                      <span className="text-[10px] text-[#0099FF] font-medium">{layout.tagline}</span>
                     </div>
                   </div>
 
                   <div
                     className={`w-4 h-4 rounded-full flex items-center justify-center ${
-                      isSelected ? 'bg-justco-teal text-black' : 'border border-slate-600'
+                      isSelected ? 'bg-[#21B5FF] text-white shadow-xs' : 'border border-slate-300 bg-white'
                     }`}
                   >
                     {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
                   </div>
                 </div>
 
-                <p className="text-[10px] text-slate-400 mt-2 leading-relaxed">{layout.description}</p>
-                <div className="mt-2 text-[9px] text-slate-500 bg-[#161E2A] px-2 py-0.5 rounded inline-block">
+                <p className="text-[10px] text-slate-600 mt-2 leading-relaxed">{layout.description}</p>
+                <div className="mt-2 text-[9px] text-slate-500 bg-white border border-slate-200 px-2 py-0.5 rounded inline-block font-mono">
                   Capacity: {layout.minPax} - {layout.maxPax} Pax
                 </div>
               </button>
@@ -180,20 +359,22 @@ export const ResourceToggleCards: React.FC = () => {
       </div>
 
       {/* VC & Hardware Integration */}
-      <div className="bg-[#141B26] border border-[#222C3D] rounded-2xl p-4 shadow-sm">
-        <div className="flex items-center justify-between mb-3">
+      <div className="relative bg-white border border-slate-200 rounded-2xl p-4 shadow-sm overflow-hidden">
+        <BrandGridWatermark className="absolute top-3 right-3 pointer-events-none select-none" opacity="opacity-30" />
+        
+        <div className="flex items-center justify-between mb-3 pr-6">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-teal-500/15 border border-teal-500/30 flex items-center justify-center text-justco-teal">
+            <div className="w-7 h-7 rounded-lg bg-[#EBF7FF] border border-[#21B5FF]/30 flex items-center justify-center text-[#0099FF]">
               <Tv className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+              <h3 className="text-xs font-bold text-[#000105] uppercase tracking-wider">
                 VC Hardware & Audio/Visual Setup
               </h3>
-              <p className="text-[11px] text-slate-400">Pre-calibrated and staged 15m prior to start</p>
+              <p className="text-[11px] text-slate-500">Pre-calibrated and staged 15m prior to start</p>
             </div>
           </div>
-          <span className="text-[10px] font-bold text-justco-teal bg-teal-500/10 px-2 py-0.5 rounded-full border border-teal-500/20">
+          <span className="text-[10px] font-bold text-[#0099FF] bg-[#EBF7FF] px-2 py-0.5 rounded-full border border-[#21B5FF]/30 font-mono">
             {selectedHardwareIds.length} Active
           </span>
         </div>
@@ -209,32 +390,32 @@ export const ResourceToggleCards: React.FC = () => {
                 onClick={() => toggleHardware(hw.id)}
                 className={`p-2.5 rounded-xl border text-left transition-all flex items-center justify-between ${
                   isSelected
-                    ? 'bg-[#192435] border-justco-teal/80 text-white'
-                    : 'bg-[#101622] border-[#1F293A] text-slate-400 hover:border-slate-600'
+                    ? 'bg-[#EBF7FF] border-[#21B5FF] text-[#000105]'
+                    : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
                 }`}
               >
                 <div className="flex items-center gap-2.5 min-w-0 pr-2">
                   <div
                     className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                      isSelected ? 'bg-justco-teal text-black' : 'bg-[#1C2534] text-slate-500'
+                      isSelected ? 'bg-[#21B5FF] text-white shadow-xs' : 'bg-slate-200 text-slate-500'
                     }`}
                   >
                     <HwIcon className="w-3.5 h-3.5" />
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-white truncate">{hw.name}</span>
-                      <span className="text-[9px] bg-cyan-500/15 text-cyan-300 px-1.5 py-0.2 rounded border border-cyan-500/30">
+                      <span className="text-xs font-bold text-[#000105] truncate">{hw.name}</span>
+                      <span className="text-[9px] bg-cyan-50 text-cyan-700 px-1.5 py-0.2 rounded border border-cyan-200 font-mono font-medium">
                         {hw.badge}
                       </span>
                     </div>
-                    <p className="text-[10px] text-slate-400 truncate">{hw.specs}</p>
+                    <p className="text-[10px] text-slate-500 truncate">{hw.specs}</p>
                   </div>
                 </div>
 
                 <div
                   className={`w-5 h-5 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                    isSelected ? 'bg-justco-teal text-black' : 'border border-slate-600'
+                    isSelected ? 'bg-[#21B5FF] text-white shadow-xs' : 'border border-slate-300 bg-white'
                   }`}
                 >
                   {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
@@ -246,20 +427,22 @@ export const ResourceToggleCards: React.FC = () => {
       </div>
 
       {/* Catering & F&B Packages */}
-      <div className="bg-[#141B26] border border-[#222C3D] rounded-2xl p-4 shadow-sm">
-        <div className="flex items-center justify-between mb-3">
+      <div className="relative bg-white border border-slate-200 rounded-2xl p-4 shadow-sm overflow-hidden">
+        <BrandGridWatermark className="absolute top-3 right-3 pointer-events-none select-none" opacity="opacity-30" />
+        
+        <div className="flex items-center justify-between mb-3 pr-6">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
+            <div className="w-7 h-7 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600">
               <Coffee className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+              <h3 className="text-xs font-bold text-[#000105] uppercase tracking-wider">
                 In-House Catering & Barista Packages
               </h3>
-              <p className="text-[11px] text-slate-400">Freshly prepared & delivered directly to suite</p>
+              <p className="text-[11px] text-slate-500">Freshly prepared & delivered directly to suite</p>
             </div>
           </div>
-          <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+          <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200 font-mono">
             {selectedCateringIds.length} Selected
           </span>
         </div>
@@ -275,26 +458,26 @@ export const ResourceToggleCards: React.FC = () => {
                 onClick={() => toggleCatering(pkg.id)}
                 className={`w-full p-3 rounded-2xl border text-left transition-all ${
                   isSelected
-                    ? 'bg-[#1C2536] border-amber-500/70 shadow-md'
-                    : 'bg-[#111722] border-[#202B3C] hover:border-[#2F3E56]'
+                    ? 'bg-amber-50/70 border-amber-400 shadow-sm'
+                    : 'bg-slate-50 border-slate-200 hover:border-slate-300'
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <h4 className="text-xs font-bold text-white">{pkg.name}</h4>
-                      <span className="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.2 rounded border border-amber-500/30 font-semibold">
+                      <h4 className="text-xs font-bold text-[#000105]">{pkg.name}</h4>
+                      <span className="text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.2 rounded border border-amber-300 font-semibold font-mono">
                         {pkg.timeSlot}
                       </span>
                     </div>
 
-                    <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">{pkg.description}</p>
+                    <p className="text-[10px] text-slate-600 mt-1 leading-relaxed">{pkg.description}</p>
 
                     <div className="flex flex-wrap items-center gap-1.5 mt-2">
                       {pkg.dietaryTags.map((tag) => (
                         <span
                           key={tag}
-                          className="text-[9px] bg-[#17202E] text-slate-300 px-1.5 py-0.5 rounded border border-[#263345]"
+                          className="text-[9px] bg-white text-slate-600 px-1.5 py-0.5 rounded border border-slate-200"
                         >
                           {tag}
                         </span>
@@ -303,15 +486,15 @@ export const ResourceToggleCards: React.FC = () => {
                   </div>
 
                   <div className="text-right flex-shrink-0">
-                    <div className="text-xs font-bold text-amber-400">
-                      ${pkg.pricePerPax} <span className="text-[10px] text-slate-400 font-normal">/ pax</span>
+                    <div className="text-xs font-bold text-amber-600">
+                      ${pkg.pricePerPax} <span className="text-[10px] text-slate-500 font-normal">/ pax</span>
                     </div>
-                    <div className="text-[10px] text-slate-400 mt-0.5 font-mono">
+                    <div className="text-[10px] text-slate-500 mt-0.5 font-mono">
                       ~${totalPkgCost} total
                     </div>
                     <div
                       className={`w-5 h-5 rounded-lg ml-auto mt-1 flex items-center justify-center ${
-                        isSelected ? 'bg-amber-400 text-black' : 'border border-slate-600'
+                        isSelected ? 'bg-amber-500 text-white shadow-xs' : 'border border-slate-300 bg-white'
                       }`}
                     >
                       {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
@@ -325,10 +508,12 @@ export const ResourceToggleCards: React.FC = () => {
       </div>
 
       {/* Special Instructions */}
-      <div className="bg-[#141B26] border border-[#222C3D] rounded-2xl p-4 shadow-sm">
-        <div className="flex items-center gap-2 mb-2">
-          <MessageSquare className="w-4 h-4 text-justco-teal" />
-          <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+      <div className="relative bg-white border border-slate-200 rounded-2xl p-4 shadow-sm overflow-hidden">
+        <BrandGridWatermark className="absolute top-3 right-3 pointer-events-none select-none" opacity="opacity-30" />
+        
+        <div className="flex items-center gap-2 mb-2 pr-6">
+          <MessageSquare className="w-4 h-4 text-[#0099FF]" />
+          <h3 className="text-xs font-bold text-[#000105] uppercase tracking-wider">
             Special Admin Instructions (Optional)
           </h3>
         </div>
@@ -337,7 +522,7 @@ export const ResourceToggleCards: React.FC = () => {
           value={specialInstructions}
           onChange={(e) => setSpecialInstructions(e.target.value)}
           placeholder="e.g. VIP guests arrive at 09:15 AM via North Atrium, need 1 HDMI adapter for presenter..."
-          className="w-full bg-[#10151E] border border-[#253245] focus:border-justco-teal rounded-xl p-2.5 text-xs text-slate-200 placeholder-slate-500 outline-none resize-none transition-colors"
+          className="w-full bg-slate-50 border border-slate-200 focus:border-[#21B5FF] rounded-xl p-2.5 text-xs text-slate-800 placeholder-slate-400 outline-none resize-none transition-colors"
         />
       </div>
     </div>

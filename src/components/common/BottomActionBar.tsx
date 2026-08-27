@@ -11,8 +11,6 @@ export const BottomActionBar: React.FC = () => {
     setStep,
     totalParticipants,
     desksCount,
-    totalCreditsUsed,
-    selectedHub,
   } = useOrchestrator();
 
   const handleNext = () => {
@@ -23,9 +21,9 @@ export const BottomActionBar: React.FC = () => {
           particleCount: 40,
           spread: 60,
           origin: { y: 0.85 },
-          colors: ['#00D2B4', '#06B6D4', '#6366F1', '#F59E0B'],
+          colors: ['#21B5FF', '#0099FF', '#000105', '#F59E0B'],
         });
-      } catch (e) {
+      } catch {
         // ignore if not supported
       }
     }
@@ -48,34 +46,34 @@ export const BottomActionBar: React.FC = () => {
   const { text: btnText, icon: BtnIcon } = getButtonText();
 
   return (
-    <div className="w-full bg-[#10151E]/95 backdrop-blur-md border-t border-[#222B3A] p-3 sticky bottom-0 z-30">
+    <div className="w-full bg-white/95 backdrop-blur-md border-t border-slate-200 p-3 sticky bottom-0 z-30 shadow-md">
       <div className="flex items-center justify-between gap-3">
         {step > 1 ? (
           <button
             onClick={prevStep}
-            className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#1A2230] hover:bg-[#232D40] text-slate-300 text-xs font-semibold border border-[#2B374C] transition-all active:scale-95"
+            className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold border border-slate-200 transition-all active:scale-95"
           >
             <ArrowLeft className="w-4 h-4" />
             <span className="hidden xs:inline">Back</span>
           </button>
         ) : (
           <div className="flex items-center gap-2 pl-1">
-            <div className="flex items-center gap-1.5 bg-[#171F2C] px-2.5 py-1.5 rounded-lg border border-[#273245] text-[11px] text-slate-300">
-              <Layers className="w-3.5 h-3.5 text-justco-teal" />
-              <span className="font-semibold text-white">{totalParticipants}</span> pax
-              <span className="text-slate-500">•</span>
-              <span className="font-semibold text-white">{desksCount}</span> desks
+            <div className="flex items-center gap-1.5 bg-slate-100 px-2.5 py-1.5 rounded-lg border border-slate-200 text-[11px] text-slate-600">
+              <Layers className="w-3.5 h-3.5 text-[#0099FF]" />
+              <span className="font-bold text-[#000105] font-mono">{totalParticipants}</span> pax
+              <span className="text-slate-300">•</span>
+              <span className="font-bold text-[#000105] font-mono">{desksCount}</span> desks
             </div>
           </div>
         )}
 
         <button
           onClick={step === 4 ? () => setStep(1) : handleNext}
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-justco-teal via-justco-teal-dark to-justco-teal hover:opacity-95 text-black font-bold text-xs shadow-glow-teal transition-all active:scale-[0.98] group"
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#21B5FF] hover:bg-[#0099FF] text-white font-bold text-xs shadow-glow-blue transition-all active:scale-[0.98] group"
         >
-          <BtnIcon className="w-4 h-4 text-black group-hover:rotate-12 transition-transform" />
+          <BtnIcon className="w-4 h-4 text-white group-hover:rotate-12 transition-transform" />
           <span>{btnText}</span>
-          {step < 4 && <ArrowRight className="w-4 h-4 text-black group-hover:translate-x-0.5 transition-transform" />}
+          {step < 4 && <ArrowRight className="w-4 h-4 text-white group-hover:translate-x-0.5 transition-transform" />}
         </button>
       </div>
     </div>

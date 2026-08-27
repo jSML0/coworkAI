@@ -2,73 +2,77 @@
 
 @layer base {
   * {
-    border-color: #222B3A;
+    border-color: #E2E8F0;
   }
   body {
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    color: #000105;
+    background-color: #EAEEF4;
   }
 }
 
-/* Custom JustCo theme classes */
-.bg-justco-dark { background-color: #0B0F15; }
-.bg-justco-card { background-color: #131822; }
-.bg-justco-surface { background-color: #1A212D; }
-.bg-justco-hover { background-color: #222B3A; }
-.border-justco-border { border-color: #273142; }
-.text-justco-teal { color: #00D2B4; }
-.bg-justco-teal { background-color: #00D2B4; }
-.hover\:bg-justco-teal-dark:hover { background-color: #009F89; }
-.text-justco-muted { color: #8B98A9; }
-.shadow-glow-teal { box-shadow: 0 0 20px -3px rgba(0, 210, 180, 0.35); }
-.shadow-glow-indigo { box-shadow: 0 0 20px -3px rgba(99, 102, 241, 0.35); }
+/* Custom JustCo Brand theme classes */
+.bg-justco-blue { background-color: #21B5FF; }
+.text-justco-blue { color: #21B5FF; }
+.border-justco-blue { border-color: #21B5FF; }
 
-/* Custom modern scrollbar */
+.bg-justco-charcoal { background-color: #000105; }
+.text-justco-charcoal { color: #000105; }
+
+.bg-justco-teal { background-color: #21B5FF; }
+.text-justco-teal { color: #21B5FF; }
+.hover\:bg-justco-teal-dark:hover { background-color: #0099FF; }
+
+.shadow-glow-blue { box-shadow: 0 0 20px -3px rgba(33, 181, 255, 0.4); }
+.shadow-glow-teal { box-shadow: 0 0 20px -3px rgba(33, 181, 255, 0.4); }
+
+/* Custom clean light scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.6);
+  background: #F1F5F9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #273142;
+  background: #CBD5E1;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #36ECD2;
+  background: #21B5FF;
 }
 
-/* Glassmorphism utilities */
+/* Light Glassmorphism utilities */
 .glass-panel {
-  background: rgba(19, 24, 34, 0.85);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(226, 232, 240, 0.9);
 }
 
 .glass-card {
-  background: rgba(26, 33, 45, 0.75);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .glass-pill {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(0, 1, 5, 0.04);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(0, 1, 5, 0.08);
 }
 
-/* Subtle holographic pass effect */
+/* Holographic card shimmer for digital passes */
 .hologram-shimmer {
   background: linear-gradient(
     135deg,
     rgba(255, 255, 255, 0) 0%,
-    rgba(0, 210, 180, 0.12) 35%,
-    rgba(99, 102, 241, 0.18) 50%,
+    rgba(33, 181, 255, 0.15) 35%,
+    rgba(99, 102, 241, 0.15) 50%,
     rgba(245, 158, 11, 0.12) 65%,
     rgba(255, 255, 255, 0) 100%
   );
@@ -92,3 +96,4 @@
 .animate-scanline {
   animation: scanline 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
+

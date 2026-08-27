@@ -3,7 +3,8 @@ import { useOrchestrator } from '../../context/OrchestratorContext';
 import { ActionChecklist } from './ActionChecklist';
 import { PassDistributionList } from './PassDistributionList';
 import { OpsServiceTicket } from './OpsServiceTicket';
-import { Send, ArrowRight, ShieldCheck, CheckCircle2, QrCode } from 'lucide-react';
+import { Send, ArrowRight } from 'lucide-react';
+import { BrandGridWatermark } from '../common/BrandGridWatermark';
 
 export const Screen3Passes: React.FC = () => {
   const { nextStep } = useOrchestrator();
@@ -12,7 +13,7 @@ export const Screen3Passes: React.FC = () => {
     <div className="p-4 space-y-4 animate-in fade-in duration-300">
       {/* Top Banner */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-xs text-justco-teal font-bold">
+        <div className="flex items-center gap-1.5 text-xs text-[#0099FF] font-bold">
           <Send className="w-4 h-4" />
           <span>Step 3 of 4: Automated Actions & Pass Distribution</span>
         </div>
@@ -28,14 +29,16 @@ export const Screen3Passes: React.FC = () => {
       <PassDistributionList />
 
       {/* Inline Proceed CTA */}
-      <div className="p-4 rounded-2xl bg-gradient-to-r from-[#172335] to-[#121B27] border border-teal-500/30 flex items-center justify-between">
-        <div>
-          <h4 className="text-xs font-bold text-white">All passes dispatched!</h4>
-          <p className="text-[11px] text-slate-400">View post-meeting space utilization & AI advisory</p>
+      <div className="relative p-4 rounded-2xl bg-white border border-[#21B5FF]/40 shadow-sm flex items-center justify-between overflow-hidden">
+        <BrandGridWatermark className="absolute top-2 right-2 pointer-events-none select-none" opacity="opacity-30" />
+        
+        <div className="pr-4">
+          <h4 className="text-xs font-bold text-[#000105]">All passes dispatched!</h4>
+          <p className="text-[11px] text-slate-500">View post-meeting space utilization & AI advisory</p>
         </div>
         <button
           onClick={nextStep}
-          className="px-3.5 py-2 rounded-xl bg-justco-teal hover:bg-justco-teal-dark text-black font-bold text-xs shadow-glow-teal flex items-center gap-1.5 transition-all"
+          className="px-3.5 py-2 rounded-xl bg-[#21B5FF] hover:bg-[#0099FF] text-white font-bold text-xs shadow-glow-blue flex items-center gap-1.5 transition-all flex-shrink-0"
         >
           <span>View Space Analytics</span>
           <ArrowRight className="w-3.5 h-3.5" />

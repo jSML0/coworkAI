@@ -88,6 +88,7 @@ export interface ClusterPlan {
   roomZone: string;
   desksZone: string;
   deskIds: string[];
+  privacyPodsCount?: number;
   distanceMeters: number;
   floorLevel: string;
 }
@@ -134,9 +135,13 @@ export interface PresetScenario {
   selectedVisitors: Visitor[];
   hubId: string;
   desksCount: number;
+  privacyPodsCount?: number;
   layoutId: string;
+  timeSlot?: { start: string; end: string; label: string; hours: number };
   hardwareIds: string[];
   cateringIds: string[];
 }
 
+
 export type DeviceViewMode = 'mobile' | 'tablet' | 'desktop';
+
