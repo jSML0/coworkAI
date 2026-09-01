@@ -8,6 +8,65 @@ export const DeviceFrame: React.FC<{ children: React.ReactNode }> = ({ children 
   const { deviceView, setDeviceView, activePresetId, applyPreset } = useOrchestrator();
 
   const currentTime = '9:41';
+  const isStandalone = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('standalone') === 'true';
+
+  if (isStandalone) {
+    return (
+      <div className="min-h-screen bg-[#EAEEF4] text-[#000105] flex items-center justify-center p-2 selection:bg-[#21B5FF] selection:text-white font-sans">
+        <main className="w-full flex justify-center items-start">
+          {deviceView === 'mobile' ? (
+            /* Mobile Phone Frame (iPhone 16 Pro) */
+            <div className="relative w-full max-w-[420px] bg-slate-900 rounded-[48px] p-3 shadow-2xl border-4 border-slate-700 ring-1 ring-black/10 overflow-hidden">
+              <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-[#21B5FF]/10 to-transparent pointer-events-none" />
+              <div className="relative w-full bg-[#F8FAFC] rounded-[40px] overflow-hidden flex flex-col min-h-[820px] max-h-[880px] border border-slate-300/80 shadow-inner">
+                <div className="relative w-full bg-white pt-3 px-6 pb-2 flex items-center justify-between text-xs text-[#000105] z-40 select-none border-b border-slate-100">
+                  <span className="font-bold text-[11px] tracking-tight font-mono">{currentTime}</span>
+                  <div className="w-24 h-5 bg-[#000105] rounded-full flex items-center justify-center space-x-2 px-2 border border-black/10 shadow-inner">
+                    <div className="w-2 h-2 rounded-full bg-[#21B5FF] animate-pulse" />
+                    <span className="text-[9px] font-mono text-[#21B5FF] font-medium">JustCo AI</span>
+                  </div>
+                  <div className="flex items-center space-x-1.5 text-slate-600">
+                    <span className="text-[10px] font-bold font-mono">5G</span>
+                    <div className="w-4 h-2.5 border border-slate-400 rounded-[3px] p-0.5 flex items-center">
+                      <div className="w-full h-full bg-[#21B5FF] rounded-[1px]" />
+                    </div>
+                  </div>
+                </div>
+                <div className="flex-1 overflow-y-auto overflow-x-hidden flex flex-col justify-between bg-[#F8FAFC]">
+                  {children}
+                </div>
+                <div className="w-full bg-white pb-2 pt-1 flex justify-center z-40 border-t border-slate-100">
+                  <div className="w-32 h-1 bg-slate-300 rounded-full" />
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Tablet Frame (iPad) */
+            <div className="relative w-full max-w-[740px] bg-slate-900 rounded-[36px] p-4 shadow-2xl border-4 border-slate-700 ring-1 ring-black/10">
+              <div className="relative w-full bg-[#F8FAFC] rounded-[28px] overflow-hidden flex flex-col min-h-[780px] max-h-[860px] border border-slate-300">
+                <div className="w-full bg-white px-6 py-2 flex items-center justify-between text-xs text-slate-600 border-b border-slate-200">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-[#000105] font-mono">9:41 AM</span>
+                    <span className="text-slate-300">•</span>
+                    <span className="text-xs text-[#0099FF] font-medium">JustCo Enterprise Workspace</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-[11px] bg-[#EBF7FF] text-[#0099FF] px-2 py-0.5 rounded-full border border-[#21B5FF]/20 font-medium">
+                      Singapore CBD Hub
+                    </span>
+                    <span className="text-xs font-mono">100% ⚡</span>
+                  </div>
+                </div>
+                <div className="flex-1 overflow-y-auto flex flex-col justify-between bg-[#F8FAFC]">
+                  {children}
+                </div>
+              </div>
+            </div>
+          )}
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#EAEEF4] text-[#000105] flex flex-col items-center justify-start p-2 sm:p-4 md:p-6 selection:bg-[#21B5FF] selection:text-white font-sans">

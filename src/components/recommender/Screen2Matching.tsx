@@ -24,7 +24,7 @@ export const Screen2Matching: React.FC = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5 text-xs text-[#0099FF] font-bold">
           <Sparkles className="w-4 h-4" />
-          <span>Step 2 of 4: AI Matching & Cluster Plan</span>
+          <span>Step 2 of 3: AI Matching & Plan Approval</span>
         </div>
 
         <button
@@ -50,13 +50,13 @@ export const Screen2Matching: React.FC = () => {
         
         <div className="pr-4">
           <h4 className="text-xs font-bold text-[#000105]">Satisfied with this cluster plan?</h4>
-          <p className="text-[11px] text-slate-500">Proceed to auto-issue mobile keycards & visitor passes</p>
+          <p className="text-[11px] text-slate-500">Proceed to review cost authorization & corporate payment</p>
         </div>
         <button
           onClick={nextStep}
-          className="px-3.5 py-2 rounded-xl bg-[#21B5FF] hover:bg-[#0099FF] text-white font-bold text-xs shadow-glow-blue flex items-center gap-1.5 transition-all flex-shrink-0"
+          className="px-3.5 py-2 rounded-xl bg-[#21B5FF] hover:bg-[#0099FF] text-white font-bold text-xs shadow-glow-blue flex items-center gap-1.5 transition-all flex-shrink-0 cursor-pointer"
         >
-          <span>Approve Plan</span>
+          <span>Approve</span>
           <ArrowRight className="w-3.5 h-3.5" />
         </button>
       </div>

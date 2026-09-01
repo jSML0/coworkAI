@@ -8,11 +8,11 @@ import { TicketModal } from './components/common/TicketModal';
 import { AddMemberModal } from './components/common/AddMemberModal';
 import { Screen1Setup } from './components/scheduler/Screen1Setup';
 import { Screen2Matching } from './components/recommender/Screen2Matching';
-import { Screen3Passes } from './components/automation/Screen3Passes';
-import { Screen4Analytics } from './components/analytics/Screen4Analytics';
+import { Screen3Pay } from './components/pay/Screen3Pay';
+import { DashboardScreen } from './components/dashboard/DashboardScreen';
 
 const OrchestratorAppContent: React.FC = () => {
-  const { step } = useOrchestrator();
+  const { step, showDashboard } = useOrchestrator();
 
   return (
     <DeviceFrame>
@@ -22,10 +22,15 @@ const OrchestratorAppContent: React.FC = () => {
 
         {/* Screen Content Switcher */}
         <div className="flex-1">
-          {step === 1 && <Screen1Setup />}
-          {step === 2 && <Screen2Matching />}
-          {step === 3 && <Screen3Passes />}
-          {step === 4 && <Screen4Analytics />}
+          {showDashboard ? (
+            <DashboardScreen />
+          ) : (
+            <>
+              {step === 1 && <Screen1Setup />}
+              {step === 2 && <Screen2Matching />}
+              {step === 3 && <Screen3Pay />}
+            </>
+          )}
         </div>
 
         {/* Sticky Bottom Action Bar */}

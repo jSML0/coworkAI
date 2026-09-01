@@ -17,9 +17,12 @@ export const Screen1Setup: React.FC = () => {
     setSelectedLayoutId,
     setSpecialInstructions,
     nextStep,
+    setupTab,
+    setSetupTab,
   } = useOrchestrator();
 
-  const [activeTab, setActiveTab] = useState<'team' | 'hub' | 'resources'>('team');
+  const activeTab = setupTab;
+  const setActiveTab = setSetupTab;
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [voiceText, setVoiceText] = useState(
@@ -266,21 +269,21 @@ export const Screen1Setup: React.FC = () => {
 
       {/* Next Step Jump button inside tab */}
       <div className="pt-2 flex justify-between items-center text-xs text-slate-500">
-        <span>Step 1 of 4: Configuration</span>
+        <span>Step 1 of 3: Workspace Configuration</span>
         {activeTab !== 'resources' ? (
           <button
             onClick={() => setActiveTab(activeTab === 'team' ? 'hub' : 'resources')}
-            className="flex items-center gap-1 text-[#0099FF] font-semibold hover:underline"
+            className="flex items-center gap-1 text-[#0099FF] font-semibold hover:underline cursor-pointer"
           >
-            <span>Next: {activeTab === 'team' ? 'Date & Time' : 'Resources & F&B'}</span>
+            <span>Next: {activeTab === 'team' ? 'Date & Time' : 'Resources'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         ) : (
           <button
             onClick={nextStep}
-            className="flex items-center gap-1 text-[#0099FF] font-bold hover:underline"
+            className="flex items-center gap-1 text-[#0099FF] font-bold hover:underline cursor-pointer"
           >
-            <span>Proceed to AI Matching</span>
+            <span>Schedule</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         )}

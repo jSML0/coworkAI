@@ -13,20 +13,31 @@ import {
   INITIAL_EMPLOYEES,
   INITIAL_VISITORS,
   JUSTCO_HUBS,
-  MEETING_LAYOUTS,
   PRESET_SCENARIOS,
   CATERING_PACKAGES,
 } from '../data/mockData';
 
+import confetti from 'canvas-confetti';
+
 interface OrchestratorContextType {
-  step: 1 | 2 | 3 | 4;
-  setStep: (step: 1 | 2 | 3 | 4) => void;
+  step: 1 | 2 | 3;
+  setStep: (step: 1 | 2 | 3) => void;
+  setupTab: 'team' | 'hub' | 'resources';
+  setSetupTab: (tab: 'team' | 'hub' | 'resources') => void;
   nextStep: () => void;
   prevStep: () => void;
   deviceView: DeviceViewMode;
   setDeviceView: (view: DeviceViewMode) => void;
   activePresetId: string;
   applyPreset: (presetId: string) => void;
+  
+  // Payment and Dashboard state
+  isPaid: boolean;
+  setIsPaid: (paid: boolean) => void;
+  showDashboard: boolean;
+  setShowDashboard: (show: boolean) => void;
+  processPayment: () => void;
+  resetPayment: () => void;
   
   // Selection state
   employees: Employee[];
@@ -101,39 +112,63 @@ const OrchestratorContext = createContext<OrchestratorContextType | undefined>(u
 
 
 export const OrchestratorProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
-  const [deviceView, setDeviceView] = useState<DeviceViewMode>('mobile');
-  const [activePresetId, setActivePresetId] = useState<string>('preset-tech-sprint');
+  const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams();
+  const frameParam = urlParams.get('frame');
+  
+  const stepFromUrl = parseInt(urlParams.get('step') || '1', 10);
+  const initialStep: 1 | 2 | 3 = frameParam === '4' ? 2 : (frameParam === '5' || frameParam === '6') ? 3 : (Math.min(Math.max(stepFromUrl, 1), 3) as 1 | 2 | 3);
+  const initialPaid: boolean = urlParams.get('paid') === 'true' || urlParams.get('dashboard') === 'true' || frameParam === '6';
+  const initialDashboard: boolean = initialPaid;
+  const initialTab: 'team' | 'hub' | 'resources' = frameParam === '1' ? 'team' : frameParam === '2' ? 'hub' : frameParam === '3' ? 'resources' : (urlParams.get('tab') as any) || 'team';
+  const initialPreset = frameParam ? 'preset-design-workshop' : urlParams.get('preset') || 'preset-tech-sprint';
+
+  const [step, setStepState] = useState<1 | 2 | 3>(initialStep);
+  const [isPaid, setIsPaid] = useState<boolean>(initialPaid);
+  const [showDashboard, setShowDashboard] = useState<boolean>(initialDashboard);
+  const [setupTab, setSetupTab] = useState<'team' | 'hub' | 'resources'>(initialTab);
+  const [deviceView, setDeviceView] = useState<DeviceViewMode>((urlParams.get('view') as DeviceViewMode) || 'mobile');
+  const [activePresetId, setActivePresetId] = useState<string>(initialPreset);
+
+  const setStep = (s: 1 | 2 | 3) => {
+    setShowDashboard(false);
+    setStepState(s);
+  };
+  
+  const defaultPreset = PRESET_SCENARIOS.find((p) => p.id === initialPreset) || PRESET_SCENARIOS[0];
   
   const [employees, setEmployees] = useState<Employee[]>(INITIAL_EMPLOYEES);
-  const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<string[]>([
-    'emp-1', 'emp-2', 'emp-3', 'emp-4', 'emp-5', 'emp-6'
-  ]);
-  const [visitors, setVisitors] = useState<Visitor[]>(INITIAL_VISITORS);
+  const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<string[]>(
+    defaultPreset.selectedEmployeeIds
+  );
+  const [visitors, setVisitors] = useState<Visitor[]>(
+    defaultPreset.selectedVisitors.length > 0 ? defaultPreset.selectedVisitors : INITIAL_VISITORS
+  );
   
-  const [selectedHubId, setSelectedHubId] = useState<string>('hub-marina-square');
+  const [selectedHubId, setSelectedHubId] = useState<string>(defaultPreset.hubId || 'hub-cross-street');
   const [selectedDate, setSelectedDate] = useState<string>('2026-08-25');
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState<{ start: string; end: string; label: string; hours: number }>({
-    start: '09:00',
-    end: '17:00',
-    label: 'Full Day Intensive (09:00 - 17:00)',
-    hours: 8,
-  });
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<{ start: string; end: string; label: string; hours: number }>(
+    defaultPreset.timeSlot || {
+      start: '18:00',
+      end: '22:00',
+      label: 'After-Hours Event (18:00 - 22:00)',
+      hours: 4,
+    }
+  );
   
-  const [desksCount, setDesksCount] = useState<number>(6);
-  const [desksTimeWindow, setDesksTimeWindow] = useState<string>('Full Day (09:00 - 17:00)');
-  const [privacyPodsCount, setPrivacyPodsCount] = useState<number>(2);
-  const [podsTimeWindow, setPodsTimeWindow] = useState<string>('2-Hour Focus Slot (14:00 - 16:00)');
-  const [selectedLayoutId, setSelectedLayoutId] = useState<string>('layout-workshop');
+  const [desksCount, setDesksCount] = useState<number>(defaultPreset.desksCount || 6);
+  const [desksTimeWindow, setDesksTimeWindow] = useState<string>('After-Hours Event (18:00 - 22:00)');
+  const [privacyPodsCount, setPrivacyPodsCount] = useState<number>(defaultPreset.privacyPodsCount || 2);
+  const [podsTimeWindow, setPodsTimeWindow] = useState<string>('Evening Focus (18:30 - 20:30)');
+  const [selectedLayoutId, setSelectedLayoutId] = useState<string>(defaultPreset.layoutId || 'layout-presentation');
 
-  const [selectedHardwareIds, setSelectedHardwareIds] = useState<string[]>([
-    'hw-dual-4k', 'hw-neat-360', 'hw-zoom-rooms'
-  ]);
-  const [selectedCateringIds, setSelectedCateringIds] = useState<string[]>([
-    'cat-morning-roast', 'cat-bento-lunch'
-  ]);
+  const [selectedHardwareIds, setSelectedHardwareIds] = useState<string[]>(
+    defaultPreset.hardwareIds
+  );
+  const [selectedCateringIds, setSelectedCateringIds] = useState<string[]>(
+    defaultPreset.cateringIds
+  );
   const [specialInstructions, setSpecialInstructions] = useState<string>(
-    'Ensure 4K displays are tested for Mac AirPlay; 2 vegetarian bento boxes needed.'
+    'Evening product design sprint & community launch in Event Space with after-hours building access.'
   );
   
   const [isOptimizing, setIsOptimizing] = useState<boolean>(false);
@@ -485,19 +520,49 @@ export const OrchestratorProvider: React.FC<{ children: React.ReactNode }> = ({ 
     runAIOptimization();
   };
 
+  const processPayment = () => {
+    setIsPaid(true);
+    setShowDashboard(true);
+    try {
+      confetti({
+        particleCount: 50,
+        spread: 70,
+        origin: { y: 0.75 },
+        colors: ['#21B5FF', '#0099FF', '#000105', '#10B981', '#F59E0B'],
+      });
+    } catch {
+      // ignore
+    }
+  };
+
+  const resetPayment = () => {
+    setIsPaid(false);
+    setShowDashboard(false);
+    setStepState(1);
+  };
+
   const nextStep = () => {
-    if (step < 4) {
-      const next = (step + 1) as 1 | 2 | 3 | 4;
-      setStep(next);
-      if (next === 2) {
-        runAIOptimization();
-      }
+    if (showDashboard) {
+      resetPayment();
+      return;
+    }
+    if (step === 1) {
+      setStepState(2);
+      runAIOptimization();
+    } else if (step === 2) {
+      setStepState(3);
+    } else if (step === 3) {
+      processPayment();
     }
   };
 
   const prevStep = () => {
+    if (showDashboard) {
+      setShowDashboard(false);
+      return;
+    }
     if (step > 1) {
-      setStep((step - 1) as 1 | 2 | 3 | 4);
+      setStepState((step - 1) as 1 | 2 | 3);
     }
   };
 
@@ -506,12 +571,20 @@ export const OrchestratorProvider: React.FC<{ children: React.ReactNode }> = ({ 
       value={{
         step,
         setStep,
+        setupTab,
+        setSetupTab,
         nextStep,
         prevStep,
         deviceView,
         setDeviceView,
         activePresetId,
         applyPreset,
+        isPaid,
+        setIsPaid,
+        showDashboard,
+        setShowDashboard,
+        processPayment,
+        resetPayment,
         employees,
         selectedEmployeeIds,
         toggleEmployee,

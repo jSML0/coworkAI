@@ -98,100 +98,7 @@ export const ResourceToggleCards: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      {/* Dedicated Hot Desks Co-location Counter */}
-      <div className="relative bg-white border border-slate-200 rounded-2xl p-4 shadow-sm overflow-hidden">
-        <BrandGridWatermark className="absolute top-3 right-3 pointer-events-none select-none" opacity="opacity-30" />
-        
-        <div className="flex items-center justify-between pr-6">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[#EBF7FF] border border-[#21B5FF]/30 flex items-center justify-center text-[#0099FF]">
-              <Layers className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="text-xs font-bold text-[#000105] uppercase tracking-wider">
-                Dedicated Desks Needed
-              </h3>
-              <p className="text-[11px] text-slate-500">Co-located hot desks for pre/post meeting work</p>
-            </div>
-          </div>
-
-          {/* Counter Controls */}
-          <div className="flex items-center gap-2.5 bg-slate-100 px-2.5 py-1.5 rounded-xl border border-slate-200">
-            <button
-              onClick={() => setDesksCount(Math.max(0, desksCount - 1))}
-              className="w-7 h-7 rounded-lg bg-white hover:bg-slate-200 text-[#000105] flex items-center justify-center transition-colors shadow-xs"
-            >
-              <Minus className="w-3.5 h-3.5" />
-            </button>
-            <span className="w-8 text-center font-bold text-sm text-[#0099FF] font-mono">
-              {desksCount}
-            </span>
-            <button
-              onClick={() => setDesksCount(Math.min(16, desksCount + 1))}
-              className="w-7 h-7 rounded-lg bg-white hover:bg-slate-200 text-[#000105] flex items-center justify-center transition-colors shadow-xs"
-            >
-              <Plus className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-
-        {/* Independent Window Period Selection Trigger */}
-        <div className="mt-3 pt-2.5 border-t border-slate-100 flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
-              <Clock className="w-3.5 h-3.5 text-[#0099FF]" />
-              <span>Desk Window Period:</span>
-            </div>
-
-            <button
-              onClick={() => setIsDesksWindowOpen(!isDesksWindowOpen)}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-50 hover:bg-[#EBF7FF] text-slate-700 hover:text-[#0099FF] border border-slate-200 text-[11px] font-semibold transition-all shadow-xs"
-            >
-              <Calendar className="w-3.5 h-3.5 text-[#0099FF]" />
-              <span className="font-mono">{desksTimeWindow}</span>
-              {isDesksWindowOpen ? (
-                <ChevronUp className="w-3 h-3 text-slate-400" />
-              ) : (
-                <ChevronDown className="w-3 h-3 text-slate-400" />
-              )}
-            </button>
-          </div>
-
-          {/* Collapsible Window Options */}
-          {isDesksWindowOpen && (
-            <div className="grid grid-cols-2 gap-1.5 p-2 rounded-xl bg-slate-50 border border-slate-200 animate-in fade-in duration-150">
-              {deskWindowOptions.map((opt) => (
-                <button
-                  key={opt}
-                  onClick={() => {
-                    setDesksTimeWindow(opt);
-                    setIsDesksWindowOpen(false);
-                  }}
-                  className={`text-left text-[10px] p-2 rounded-lg border font-mono transition-all ${
-                    desksTimeWindow === opt
-                      ? 'bg-[#21B5FF] text-white border-[#21B5FF] font-bold shadow-xs'
-                      : 'bg-white text-slate-700 border-slate-200 hover:border-[#21B5FF]/50'
-                  }`}
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Co-location Intelligence Highlight */}
-        <div className="mt-2.5 p-2.5 rounded-xl bg-[#EBF7FF] border border-[#21B5FF]/30 flex items-start gap-2">
-          <Sparkles className="w-3.5 h-3.5 text-[#0099FF] flex-shrink-0 mt-0.5" />
-          <p className="text-[11px] text-slate-700 leading-relaxed">
-            <strong className="text-[#0099FF]">Smart Co-Location:</strong> AI reserves {desksCount} contiguous desks in{' '}
-            <strong className="text-[#000105]">Zone B (Pods 12–{12 + Math.max(0, desksCount - 1)})</strong> for{' '}
-            <strong className="text-[#000105] font-mono">{desksTimeWindow}</strong>, directly adjacent to your meeting suite.
-          </p>
-        </div>
-      </div>
-
-      {/* Privacy Pods Needed Section */}
+      {/* 1. Privacy Pods Needed Section */}
       <div className="relative bg-white border border-slate-200 rounded-2xl p-4 shadow-sm overflow-hidden">
         <BrandGridWatermark className="absolute top-3 right-3 pointer-events-none select-none" opacity="opacity-30" />
         
@@ -290,6 +197,99 @@ export const ResourceToggleCards: React.FC = () => {
             <span className="text-[11px] text-slate-400">No private acoustic pods reserved.</span>
           </div>
         )}
+      </div>
+
+      {/* 2. Dedicated Hot Desks Co-location Counter */}
+      <div className="relative bg-white border border-slate-200 rounded-2xl p-4 shadow-sm overflow-hidden">
+        <BrandGridWatermark className="absolute top-3 right-3 pointer-events-none select-none" opacity="opacity-30" />
+        
+        <div className="flex items-center justify-between pr-6">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-[#EBF7FF] border border-[#21B5FF]/30 flex items-center justify-center text-[#0099FF]">
+              <Layers className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="text-xs font-bold text-[#000105] uppercase tracking-wider">
+                Dedicated Desks Needed
+              </h3>
+              <p className="text-[11px] text-slate-500">Co-located hot desks for pre/post meeting work</p>
+            </div>
+          </div>
+
+          {/* Counter Controls */}
+          <div className="flex items-center gap-2.5 bg-slate-100 px-2.5 py-1.5 rounded-xl border border-slate-200">
+            <button
+              onClick={() => setDesksCount(Math.max(0, desksCount - 1))}
+              className="w-7 h-7 rounded-lg bg-white hover:bg-slate-200 text-[#000105] flex items-center justify-center transition-colors shadow-xs"
+            >
+              <Minus className="w-3.5 h-3.5" />
+            </button>
+            <span className="w-8 text-center font-bold text-sm text-[#0099FF] font-mono">
+              {desksCount}
+            </span>
+            <button
+              onClick={() => setDesksCount(Math.min(16, desksCount + 1))}
+              className="w-7 h-7 rounded-lg bg-white hover:bg-slate-200 text-[#000105] flex items-center justify-center transition-colors shadow-xs"
+            >
+              <Plus className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Independent Window Period Selection Trigger */}
+        <div className="mt-3 pt-2.5 border-t border-slate-100 flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+              <Clock className="w-3.5 h-3.5 text-[#0099FF]" />
+              <span>Desk Window Period:</span>
+            </div>
+
+            <button
+              onClick={() => setIsDesksWindowOpen(!isDesksWindowOpen)}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-50 hover:bg-[#EBF7FF] text-slate-700 hover:text-[#0099FF] border border-slate-200 text-[11px] font-semibold transition-all shadow-xs"
+            >
+              <Calendar className="w-3.5 h-3.5 text-[#0099FF]" />
+              <span className="font-mono">{desksTimeWindow}</span>
+              {isDesksWindowOpen ? (
+                <ChevronUp className="w-3 h-3 text-slate-400" />
+              ) : (
+                <ChevronDown className="w-3 h-3 text-slate-400" />
+              )}
+            </button>
+          </div>
+
+          {/* Collapsible Window Options */}
+          {isDesksWindowOpen && (
+            <div className="grid grid-cols-2 gap-1.5 p-2 rounded-xl bg-slate-50 border border-slate-200 animate-in fade-in duration-150">
+              {deskWindowOptions.map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => {
+                    setDesksTimeWindow(opt);
+                    setIsDesksWindowOpen(false);
+                  }}
+                  className={`text-left text-[10px] p-2 rounded-lg border font-mono transition-all ${
+                    desksTimeWindow === opt
+                      ? 'bg-[#21B5FF] text-white border-[#21B5FF] font-bold shadow-xs'
+                      : 'bg-white text-slate-700 border-slate-200 hover:border-[#21B5FF]/50'
+                  }`}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Co-location Intelligence Highlight */}
+        <div className="mt-2.5 p-2.5 rounded-xl bg-[#EBF7FF] border border-[#21B5FF]/30 flex items-start gap-2">
+          <Sparkles className="w-3.5 h-3.5 text-[#0099FF] flex-shrink-0 mt-0.5" />
+          <p className="text-[11px] text-slate-700 leading-relaxed">
+            <strong className="text-[#0099FF]">Smart Co-Location:</strong> AI reserves {desksCount} contiguous desks in{' '}
+            <strong className="text-[#000105]">Zone B (Pods 12–{12 + Math.max(0, desksCount - 1)})</strong> for{' '}
+            <strong className="text-[#000105] font-mono">{desksTimeWindow}</strong>, directly adjacent to your meeting suite.
+          </p>
+        </div>
       </div>
 
 

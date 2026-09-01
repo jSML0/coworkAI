@@ -50,8 +50,7 @@ npm run preview
 ## 📂 Architecture & Features
 
 - **100% Client-Side State**: Uses React Context API (`src/context/OrchestratorContext.tsx`) and mock data (`src/data/mockData.ts`).
-- **Interactive Multi-Step Flow**:
-  1. **Schedule & Space Setup**: Interactive date picker, team & visitor roster, room layout & AV hardware selection, catering packages.
-  2. **AI Recommendation & Floor Matching**: Proximity clustering score, floor maps, trade-off comparisons.
-  3. **Pass Distribution & Ticket Automation**: Digital visitor passes with QR codes, NFC passes, facility Ops tickets.
-  4. **Utilization & Cost Analytics**: Real-time budget breakdown, ESG carbon offsets, attendance tracking, and space utilization heatmap.
+- **Streamlined 3-Step Flow**:
+  1. **Setup**: Multi-variable scheduling parameters, interactive team & visitor roster, hub location selection, room layout & AV hardware toggles, and catering packages.
+  2. **Approve**: AI-driven proximity clustering match, recommended center card, co-located floor cluster visualizer (room + adjacent hot desks + privacy pods), and trade-off alternatives.
+  3. **Pay**: Itemized cost ledger, corporate credit deduction, pre-authorized corporate card billing, bundle savings callout, and a prominent "Pay" button. Upon payment confirmation, displays the real-time **Cost & Utilization Dashboard** (attendance tracking, IoT check-in telemetry, utilization heatmaps, ESG eco-savings) and **AI Space Advisory Upgrade Plan Recommendation**.
